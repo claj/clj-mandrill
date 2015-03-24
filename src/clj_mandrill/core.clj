@@ -1,6 +1,6 @@
 (ns clj-mandrill.core
-  (:require [clj-http.client :as client])
-  (:use [cheshire.core]))
+  (:require [clj-http.client :as client]
+            [cheshire.core :refer [generate-string]]))
 
 (def ^:dynamic *mandrill-api-key*
   (let [env (System/getenv)]

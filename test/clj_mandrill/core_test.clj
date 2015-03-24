@@ -1,8 +1,16 @@
 (ns clj-mandrill.core-test
-  (:use clojure.test
-        clj-mandrill.core
-        clj-http.fake
-        cheshire.core))
+  (:require [clojure.test :refer :all]
+            [clj-mandrill.core :refer [mandrill-url
+                                       method-url
+                                       call-mandrill
+                                       send-message
+                                       user-info
+                                       ping
+                                       senders
+                                       send-template
+                                       *mandrill-api-key*]]
+            [clj-http.fake :refer [with-fake-routes]] 
+            [cheshire.core :refer []]))
 
 
 (deftest url-api-keys
@@ -13,7 +21,7 @@
     (is (= "https://mandrillapp.com/api/1.0/users/ping.json" (method-url "users/ping")))
     (with-fake-routes
       { "https://mandrillapp.com/api/1.0/messages/send.json"
-        (fn [req] (let [ body (slurp (.getContent (:body req))) ]
+        (fn [req] (let [ body (slurp (:body req)) ]
                     {:status 200 :headers {"Content-type" "application/json"} :body body }))}
 
       (let [ resp (call-mandrill "messages/send" {:email_address "bob@test.com"})] ; Note this is not a real api
@@ -25,7 +33,7 @@
   (binding [ *mandrill-api-key* "abcdefg" ]
     (with-fake-routes
       { "https://mandrillapp.com/api/1.0/messages/send.json"
-        (fn [req] (let [ body (slurp (.getContent (:body req))) ]
+        (fn [req] (let [ body (slurp (:body req)) ]
                     {:status 200 :headers {"Content-type" "application/json"} :body body }))}
 
       (let [ resp (send-message {:text "Hi" :subject "Just a note" :from_email "alice@test.com" :from_name "Alice"
@@ -40,7 +48,7 @@
   (binding [ *mandrill-api-key* "abcdefg" ]
     (with-fake-routes
       { "https://mandrillapp.com/api/1.0/messages/send-template.json"
-        (fn [req] (let [ body (slurp (.getContent (:body req))) ]
+        (fn [req] (let [ body (slurp (:body req)) ]
                     {:status 200 :headers {"Content-type" "application/json"} :body body }))}
 
       (let [ resp (send-template "verify_email" {:subject "Just a note" :from_email "alice@test.com" :from_name "Alice"
@@ -69,7 +77,7 @@
   (binding [ *mandrill-api-key* "abcdefg" ]
     (with-fake-routes
       { "https://mandrillapp.com/api/1.0/users/info.json"
-        (fn [req] (let [ body (slurp (.getContent (:body req))) ]
+        (fn [req] (let [ body (slurp (:body req)) ]
                     {:status 200 :headers {"Content-type" "application/json"} :body body }))}
 
       (let [ resp (user-info)]
@@ -79,7 +87,7 @@
   (binding [ *mandrill-api-key* "abcdefg" ]
     (with-fake-routes
       { "https://mandrillapp.com/api/1.0/users/ping.json"
-        (fn [req] (let [ body (slurp (.getContent (:body req))) ]
+        (fn [req] (let [ body (slurp (:body req)) ]
                     {:status 200 :headers {"Content-type" "application/json"} :body body }))}
 
       (let [ resp (ping)]
@@ -89,7 +97,7 @@
   (binding [ *mandrill-api-key* "abcdefg" ]
     (with-fake-routes
       { "https://mandrillapp.com/api/1.0/users/senders.json"
-        (fn [req] (let [ body (slurp (.getContent (:body req))) ]
+        (fn [req] (let [ body (slurp (:body req)) ]
                     {:status 200 :headers {"Content-type" "application/json"} :body body }))}
 
       (let [ resp (senders)]
